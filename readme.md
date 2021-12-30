@@ -4,5 +4,5 @@
 
 Demo of Cloth Simulation.
 
-![Demo-Video](./Videos/rope_sim_demo.mp4)
+https://user-images.githubusercontent.com/37266860/147711799-d4bcef23-e2a5-494f-9302-edb93b3e5eea.mp4
 
