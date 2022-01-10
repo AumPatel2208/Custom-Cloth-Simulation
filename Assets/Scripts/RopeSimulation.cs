@@ -1,7 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 public class Point {
     public Point(Vector3 pos) {
@@ -139,7 +139,7 @@ public class RopeSimulation : MonoBehaviour {
         }
 
         // Cutting Line : Hold Mouse 4
-        if (Input.GetMouseButtonDown(3)) {
+        if (Input.GetMouseButtonDown(3) || Input.GetKeyDown(KeyCode.C)) {
             stickCutter.SetPosition(0, screenMousePos);
             isCutting = true;
         }
@@ -154,7 +154,7 @@ public class RopeSimulation : MonoBehaviour {
         }
         
         // Cut Line : Release Mouse 4
-        if (Input.GetMouseButtonUp(3)) {
+        if (Input.GetMouseButtonUp(3) || Input.GetKeyUp(KeyCode.C)) {
             stickCutter.SetPosition(1, screenMousePos);
             CutSticks();
             isCutting = false;
@@ -306,7 +306,7 @@ public class RopeSimulation : MonoBehaviour {
         }
         
         
-        stickIndexesToDeleteSort();
+        stickIndexesToDelete.Sort();
         stickIndexesToDelete.Reverse();
         
         foreach (int i in stickIndexesToDelete) {
@@ -383,25 +383,49 @@ public class RopeSimulation : MonoBehaviour {
     }
 
     void Simulate() {
-        foreach (var p in points) {
-            if (!p.isLocked) {
-                Vector3 positionBeforeUpdate = p.position;
-                p.position += p.position - p.prevPosition;
-                p.position += Vector3.down * gravity * Time.deltaTime * Time.deltaTime;
-                p.prevPosition = positionBeforeUpdate;
+        // Random r = new Random();
+        Random r = new Random();
+        foreach (int i in Enumerable.Range(0, points.Count()).OrderBy(x => r.Next())) {
+            if (!points[i].isLocked) {
+                Vector3 positionBeforeUpdate = points[i].position;
+                points[i].position += points[i].position - points[i].prevPosition;
+                points[i].position += Vector3.down * (gravity * Time.deltaTime * Time.deltaTime);
+                points[i].prevPosition = positionBeforeUpdate;
             }
         }
 
-        for (int i = 0; i < iterations; i++) {
-            foreach (var stick in sticks) {
-                Vector3 stickCentre = (stick.pointA.position + stick.pointB.position) / 2;
-                Vector3 stickDir = (stick.pointA.position - stick.pointB.position).normalized;
+        
+        // foreach (var p in points) {
+        //     if (!p.isLocked) {
+        //         Vector3 positionBeforeUpdate = p.position;
+        //         p.position += p.position - p.prevPosition;
+        //         p.position += Vector3.down * gravity * Time.deltaTime * Time.deltaTime;
+        //         p.prevPosition = positionBeforeUpdate;
+        //     }
+        // }
 
-                if (!stick.pointA.isLocked)
-                    stick.pointA.position = stickCentre + stickDir * stick.length / 2;
-                if (!stick.pointB.isLocked)
-                    stick.pointB.position = stickCentre - stickDir * stick.length / 2;
+        for (int j = 0; j < iterations; j++) {
+
+            foreach (int i in Enumerable.Range(0, sticks.Count()).OrderBy(x => r.Next())) {
+                Vector3 stickCentre = (sticks[i].pointA.position + sticks[i].pointB.position) / 2;
+                Vector3 stickDir = (sticks[i].pointA.position - sticks[i].pointB.position).normalized;
+
+                if (!sticks[i].pointA.isLocked)
+                    sticks[i].pointA.position = stickCentre + stickDir * sticks[i].length / 2;
+                if (!sticks[i].pointB.isLocked)
+                    sticks[i].pointB.position = stickCentre - stickDir * sticks[i].length / 2;
             }
+
+
+            // foreach (var stick in sticks) {
+            //     Vector3 stickCentre = (stick.pointA.position + stick.pointB.position) / 2;
+            //     Vector3 stickDir = (stick.pointA.position - stick.pointB.position).normalized;
+
+            //     if (!stick.pointA.isLocked)
+            //         stick.pointA.position = stickCentre + stickDir * stick.length / 2;
+            //     if (!stick.pointB.isLocked)
+            //         stick.pointB.position = stickCentre - stickDir * stick.length / 2;
+            // }
         }
     }
 }
