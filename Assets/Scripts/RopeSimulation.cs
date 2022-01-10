@@ -304,7 +304,11 @@ public class RopeSimulation : MonoBehaviour {
                 stickIndexesToDelete.Add(i);
             }
         }
-
+        
+        
+        stickIndexesToDeleteSort();
+        stickIndexesToDelete.Reverse();
+        
         foreach (int i in stickIndexesToDelete) {
             DeleteStick(i);
         }
